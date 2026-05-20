@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Caso cubierto: entry con 2 lotes, multiples CPVs, 2 TenderResult (1 adjudicado + 1 desierto),
+     adjudicatario PYME, publicacion oficial, jerarquia de organo -->
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <id>https://contrataciondelestado.es/sindicacion/sindicacion_643/licitacionesPerfilesContratanteCompleto3.atom</id>
+  <title>Licitaciones - test fixture completa</title>
+  <updated>2026-03-25T12:00:00.000+01:00</updated>
+  <entry>
+    <id>https://contrataciondelestado.es/sindicacion/licitacionesPerfilContratante/TEST002</id>
+    <link href="https://contrataciondelestado.es/wps/poc?uri=deeplink:detalle_licitacion&amp;idEvl=DEF456"/>
+    <title>Suministro de material deportivo para centros educativos</title>
+    <summary type="text">Id licitacion: TEST002; Organo: DG Deportes; Importe: 250000; Estado: Adjudicada</summary>
+    <updated>2026-04-12T11:30:00.000+02:00</updated>
+    <cac-place-ext:ContractFolderStatus
+        xmlns:cac="urn:dgpe:names:draft:codice:schema:xsd:CommonAggregateComponents-2"
+        xmlns:cbc="urn:dgpe:names:draft:codice:schema:xsd:CommonBasicComponents-2"
+        xmlns:cac-place-ext="urn:dgpe:names:draft:codice-place-ext:schema:xsd:CommonAggregateComponents-2"
+        xmlns:cbc-place-ext="urn:dgpe:names:draft:codice-place-ext:schema:xsd:CommonBasicComponents-2">
+      <cbc:ContractFolderID>EXP/2026/0099</cbc:ContractFolderID>
+      <cbc-place-ext:ContractFolderStatusCode>ADJ</cbc-place-ext:ContractFolderStatusCode>
+      <cac-place-ext:LocatedContractingParty>
+        <cac:Party>
+          <cac:PartyIdentification>
+            <cbc:ID schemeName="NIF">S2826006H</cbc:ID>
+          </cac:PartyIdentification>
+          <cac:PartyIdentification>
+            <cbc:ID schemeName="DIR3">E00126603</cbc:ID>
+          </cac:PartyIdentification>
+          <cac:PartyName>
+            <cbc:Name>Direccion General de Deportes</cbc:Name>
+          </cac:PartyName>
+          <cac:PostalAddress>
+            <cbc:CityName>Madrid</cbc:CityName>
+            <cbc:PostalZone>28071</cbc:PostalZone>
+          </cac:PostalAddress>
+        </cac:Party>
+        <cac-place-ext:ParentLocatedParty>
+          <cac:PartyName>
+            <cbc:Name>Secretaria de Estado para el Deporte</cbc:Name>
+          </cac:PartyName>
+          <cac-place-ext:ParentLocatedParty>
+            <cac:PartyName>
+              <cbc:Name>Ministerio de Cultura y Deporte</cbc:Name>
+            </cac:PartyName>
+          </cac-place-ext:ParentLocatedParty>
+        </cac-place-ext:ParentLocatedParty>
+      </cac-place-ext:LocatedContractingParty>
+      <cac:ProcurementProject>
+        <cbc:Name>Suministro de material deportivo para centros educativos</cbc:Name>
+        <cbc:TypeCode>1</cbc:TypeCode>
+        <cac:BudgetAmount>
+          <cbc:EstimatedOverallContractAmount currencyID="EUR">300000.00</cbc:EstimatedOverallContractAmount>
+          <cbc:TaxExclusiveAmount currencyID="EUR">250000.00</cbc:TaxExclusiveAmount>
+          <cbc:TotalAmount currencyID="EUR">302500.00</cbc:TotalAmount>
+        </cac:BudgetAmount>
+        <cac:RequiredCommodityClassification>
+          <cbc:ItemClassificationCode>37400000-2</cbc:ItemClassificationCode>
+        </cac:RequiredCommodityClassification>
+        <cac:RequiredCommodityClassification>
+          <cbc:ItemClassificationCode>37410000-5</cbc:ItemClassificationCode>
+        </cac:RequiredCommodityClassification>
+        <cac:RealizedLocation>
+          <cbc:CountrySubentity>Madrid</cbc:CountrySubentity>
+          <cbc:CountrySubentityCode>ES300</cbc:CountrySubentityCode>
+        </cac:RealizedLocation>
+        <cac:PlannedPeriod>
+          <cbc:DurationMeasure unitCode="MON">24</cbc:DurationMeasure>
+        </cac:PlannedPeriod>
+      </cac:ProcurementProject>
+      <cac:TenderingProcess>
+        <cbc:ProcedureCode>1</cbc:ProcedureCode>
+        <cbc:UrgencyCode>1</cbc:UrgencyCode>
+        <cac:TenderSubmissionDeadlinePeriod>
+          <cbc:EndDate>2026-03-15</cbc:EndDate>
+          <cbc:EndTime>14:00:00</cbc:EndTime>
+        </cac:TenderSubmissionDeadlinePeriod>
+      </cac:TenderingProcess>
+      <cac:ProcurementProjectLot>
+        <cbc:ID>1</cbc:ID>
+        <cac:ProcurementProject>
+          <cbc:Name>Lote 1: Material deportivo de educacion fisica</cbc:Name>
+          <cac:BudgetAmount>
+            <cbc:TaxExclusiveAmount currencyID="EUR">150000.00</cbc:TaxExclusiveAmount>
+            <cbc:TotalAmount currencyID="EUR">181500.00</cbc:TotalAmount>
+          </cac:BudgetAmount>
+          <cac:RequiredCommodityClassification>
+            <cbc:ItemClassificationCode>37400000-2</cbc:ItemClassificationCode>
+          </cac:RequiredCommodityClassification>
+        </cac:ProcurementProject>
+      </cac:ProcurementProjectLot>
+      <cac:ProcurementProjectLot>
+        <cbc:ID>2</cbc:ID>
+        <cac:ProcurementProject>
+          <cbc:Name>Lote 2: Material para deportes de equipo</cbc:Name>
+          <cac:BudgetAmount>
+            <cbc:TaxExclusiveAmount currencyID="EUR">100000.00</cbc:TaxExclusiveAmount>
+            <cbc:TotalAmount currencyID="EUR">121000.00</cbc:TotalAmount>
+          </cac:BudgetAmount>
+          <cac:RequiredCommodityClassification>
+            <cbc:ItemClassificationCode>37410000-5</cbc:ItemClassificationCode>
+          </cac:RequiredCommodityClassification>
+        </cac:ProcurementProject>
+      </cac:ProcurementProjectLot>
+      <cac:TenderResult>
+        <cbc:ResultCode>8</cbc:ResultCode>
+        <cbc:AwardDate>2026-04-10</cbc:AwardDate>
+        <cbc:ReceivedTenderQuantity>5</cbc:ReceivedTenderQuantity>
+        <cbc:SMEAwardedIndicator>true</cbc:SMEAwardedIndicator>
+        <cac:WinningParty>
+          <cac:PartyIdentification>
+            <cbc:ID schemeName="NIF">B12345678</cbc:ID>
+          </cac:PartyIdentification>
+          <cac:PartyName>
+            <cbc:Name>Sportia SL</cbc:Name>
+          </cac:PartyName>
+        </cac:WinningParty>
+        <cac:AwardedTenderedProject>
+          <cbc:ProcurementProjectLotID>1</cbc:ProcurementProjectLotID>
+          <cac:LegalMonetaryTotal>
+            <cbc:TaxExclusiveAmount currencyID="EUR">140000.00</cbc:TaxExclusiveAmount>
+            <cbc:PayableAmount currencyID="EUR">169400.00</cbc:PayableAmount>
+          </cac:LegalMonetaryTotal>
+        </cac:AwardedTenderedProject>
+      </cac:TenderResult>
+      <cac:TenderResult>
+        <cbc:ResultCode>3</cbc:ResultCode>
+        <cbc:AwardDate>2026-04-10</cbc:AwardDate>
+        <cbc:ReceivedTenderQuantity>0</cbc:ReceivedTenderQuantity>
+        <cac:AwardedTenderedProject>
+          <cbc:ProcurementProjectLotID>2</cbc:ProcurementProjectLotID>
+        </cac:AwardedTenderedProject>
+      </cac:TenderResult>
+      <cac:LegalDocumentReference>
+        <cbc:ID>PCAP-2026-099</cbc:ID>
+        <cac:Attachment>
+          <cac:ExternalReference>
+            <cbc:URI>https://contrataciondelestado.es/docs/pcap-2026-099.pdf</cbc:URI>
+          </cac:ExternalReference>
+        </cac:Attachment>
+      </cac:LegalDocumentReference>
+      <cac:TechnicalDocumentReference>
+        <cbc:ID>PPT-2026-099</cbc:ID>
+        <cac:Attachment>
+          <cac:ExternalReference>
+            <cbc:URI>https://contrataciondelestado.es/docs/ppt-2026-099.pdf</cbc:URI>
+          </cac:ExternalReference>
+        </cac:Attachment>
+      </cac:TechnicalDocumentReference>
+      <cac-place-ext:ValidNoticeInfo>
+        <cbc-place-ext:NoticeTypeCode>DOC_CN</cbc-place-ext:NoticeTypeCode>
+        <cac-place-ext:AdditionalPublicationStatus>
+          <cbc-place-ext:PublicationMediaName>BOE</cbc-place-ext:PublicationMediaName>
+          <cac-place-ext:AdditionalPublicationDocumentReference>
+            <cbc:IssueDate>2026-02-15</cbc:IssueDate>
+          </cac-place-ext:AdditionalPublicationDocumentReference>
+        </cac-place-ext:AdditionalPublicationStatus>
+      </cac-place-ext:ValidNoticeInfo>
+    </cac-place-ext:ContractFolderStatus>
+  </entry>
+</feed>

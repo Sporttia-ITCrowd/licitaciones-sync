@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Caso cubierto: tombstones RFC 6721 con motivos ANULADA y CERRADA -->
+<feed xmlns="http://www.w3.org/2005/Atom"
+      xmlns:at="http://purl.org/atompub/tombstones/1.0">
+  <id>https://contrataciondelestado.es/sindicacion/sindicacion_643/licitacionesPerfilesContratanteCompleto3.atom</id>
+  <title>Licitaciones - test fixture tombstone</title>
+  <updated>2026-03-25T12:00:00.000+01:00</updated>
+  <link rel="next" href="https://contrataciondelestado.es/sindicacion/sindicacion_643/licitaciones_20260324.atom"/>
+  <at:deleted-entry ref="https://contrataciondelestado.es/sindicacion/licitacionesPerfilContratante/TEST_ANUL_001"
+                    when="2026-03-20T10:00:00.000+01:00">
+    <at:comment type="ANULADA"/>
+  </at:deleted-entry>
+  <at:deleted-entry ref="https://contrataciondelestado.es/sindicacion/licitacionesPerfilContratante/TEST_CERR_001"
+                    when="2026-03-21T11:00:00.000+01:00">
+    <at:comment type="CERRADA"/>
+  </at:deleted-entry>
+</feed>

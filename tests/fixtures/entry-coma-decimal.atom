@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Caso cubierto: importes con coma decimal (quirk #1 de la spec, mezclados en mismo XML) -->
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <id>https://contrataciondelestado.es/sindicacion/sindicacion_643/licitacionesPerfilesContratanteCompleto3.atom</id>
+  <title>Licitaciones - test fixture coma decimal</title>
+  <updated>2026-03-25T12:00:00.000+01:00</updated>
+  <entry>
+    <id>https://contrataciondelestado.es/sindicacion/licitacionesPerfilContratante/TEST003</id>
+    <link href="https://contrataciondelestado.es/wps/poc?uri=deeplink:detalle_licitacion&amp;idEvl=GHI789"/>
+    <title>Construccion polideportivo municipal</title>
+    <summary type="text">Id licitacion: TEST003</summary>
+    <updated>2026-03-25T10:00:00.000+01:00</updated>
+    <cac-place-ext:ContractFolderStatus
+        xmlns:cac="urn:dgpe:names:draft:codice:schema:xsd:CommonAggregateComponents-2"
+        xmlns:cbc="urn:dgpe:names:draft:codice:schema:xsd:CommonBasicComponents-2"
+        xmlns:cac-place-ext="urn:dgpe:names:draft:codice-place-ext:schema:xsd:CommonAggregateComponents-2"
+        xmlns:cbc-place-ext="urn:dgpe:names:draft:codice-place-ext:schema:xsd:CommonBasicComponents-2">
+      <cbc:ContractFolderID>EXP/2026/0500</cbc:ContractFolderID>
+      <cbc-place-ext:ContractFolderStatusCode>PUB</cbc-place-ext:ContractFolderStatusCode>
+      <cac-place-ext:LocatedContractingParty>
+        <cac:Party>
+          <cac:PartyIdentification>
+            <cbc:ID schemeName="NIF">Q1818001E</cbc:ID>
+          </cac:PartyIdentification>
+          <cac:PartyName>
+            <cbc:Name>Diputacion Provincial de Granada</cbc:Name>
+          </cac:PartyName>
+        </cac:Party>
+      </cac-place-ext:LocatedContractingParty>
+      <cac:ProcurementProject>
+        <cbc:Name>Construccion polideportivo municipal</cbc:Name>
+        <cbc:TypeCode>3</cbc:TypeCode>
+        <cac:BudgetAmount>
+          <cbc:EstimatedOverallContractAmount currencyID="EUR">10000000</cbc:EstimatedOverallContractAmount>
+          <cbc:TotalAmount currencyID="EUR">5989390,79</cbc:TotalAmount>
+          <cbc:TaxExclusiveAmount currencyID="EUR">4949909.74</cbc:TaxExclusiveAmount>
+        </cac:BudgetAmount>
+        <cac:RealizedLocation>
+          <cbc:CountrySubentityCode>ES614</cbc:CountrySubentityCode>
+        </cac:RealizedLocation>
+      </cac:ProcurementProject>
+      <cac:TenderingProcess>
+        <cbc:ProcedureCode>1</cbc:ProcedureCode>
+      </cac:TenderingProcess>
+    </cac-place-ext:ContractFolderStatus>
+  </entry>
+</feed>

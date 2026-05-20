@@ -1,0 +1,141 @@
+name: Hotfix versioning and build
+
+on:
+  workflow_dispatch:
+
+env:
+  GAR_LOCATION: europe-west1-docker.pkg.dev/atlantean-app-120410/sporttia/licitaciones-sync
+  COMMIT_FILTER: "^(feat|fix|docs|chore|refactor|test|style|perf|ci)(\\([^)]+\\))?:.*"
+
+jobs:
+  versioning:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref_name, 'hotfix/')
+    permissions:
+      contents: write
+    outputs:
+      new_version: ${{ steps.get_version.outputs.new_version }}
+      tag_commits: ${{ steps.get_commits.outputs.tag_commits }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Make all scripts executable
+        run: chmod +x .github/scripts/*.sh
+
+      - name: Configure git
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+
+      - name: Detect base version (x.y.z)
+        id: base
+        run: |
+          BASE_VERSION=$(.github/scripts/detect_base_version.sh)
+          echo "BASE_VERSION=$BASE_VERSION" >> $GITHUB_ENV
+
+      - name: Validate branch contains latest hotfix
+        run: .github/scripts/validate_hotfix_up_to_date.sh "$BASE_VERSION"
+
+      - name: Calculate next hotfix version
+        id: get_version
+        run: |
+          NEW_VERSION=$(.github/scripts/calculate_next_hotfix.sh "$BASE_VERSION")
+          echo "New version calculated: $NEW_VERSION"
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Get formatted commits
+        id: get_commits
+        run: |
+          LAST_HOTFIX_TAG=$(.github/scripts/get_last_hotfix_tag.sh "$BASE_VERSION")
+          TAG_COMMITS=$(.github/scripts/get_commits.sh "$LAST_HOTFIX_TAG" "$COMMIT_FILTER")
+
+          if [[ -z "$TAG_COMMITS" ]]; then
+            echo "::error::❌ No relevant commits found since $LAST_HOTFIX_TAG. Exiting."
+            exit 1
+          fi
+
+          echo "tag_commits<<EOF" >> $GITHUB_OUTPUT
+          echo "$TAG_COMMITS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+  build:
+    runs-on: ubuntu-latest
+    needs: versioning
+    env:
+      NEW_VERSION: ${{ needs.versioning.outputs.new_version }}
+      TAG_COMMITS: ${{ needs.versioning.outputs.tag_commits }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set SHA
+        id: git_sha
+        run: |
+          echo "gitsha=${{ github.sha }}" >> $GITHUB_OUTPUT
+
+      - name: Login to GCR
+        uses: docker/login-action@v3
+        with:
+          registry: europe-west1-docker.pkg.dev
+          username: _json_key
+          password: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache-app
+          key: ${{ runner.os }}-buildx-app-${{ steps.git_sha.outputs.gitsha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-app-
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v6
+        with:
+          file: docker/Dockerfile
+          builder: ${{ steps.buildx.outputs.name }}
+          push: true
+          tags: ${{ env.GAR_LOCATION }}:${{ env.NEW_VERSION }}
+          build-args: |
+            NEW_VERSION=${{ env.NEW_VERSION }}
+          cache-from: type=local,src=/tmp/.buildx-cache-app
+          cache-to: type=local,dest=/tmp/.buildx-cache-app-new,mode=max
+          provenance: false
+
+      - name: Move cache
+        run: |
+          rm -rf /tmp/.buildx-cache-app
+          mv /tmp/.buildx-cache-app-new /tmp/.buildx-cache-app
+
+  tagging:
+    runs-on: ubuntu-latest
+    needs: [versioning, build]
+    permissions:
+      contents: write
+    env:
+      NEW_VERSION: ${{ needs.versioning.outputs.new_version }}
+      TAG_COMMITS: ${{ needs.versioning.outputs.tag_commits }}
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git identity
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+
+      - name: Tag version
+        run: |
+          git tag -a "$NEW_VERSION" -m "Version $NEW_VERSION" -m "$TAG_COMMITS"
+          git push origin "$NEW_VERSION"

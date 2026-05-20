@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Caso cubierto: entry minima con campos basicos, estado PUB, sin lotes ni adjudicacion -->
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <id>https://contrataciondelestado.es/sindicacion/sindicacion_643/licitacionesPerfilesContratanteCompleto3.atom</id>
+  <title>Licitaciones - test fixture basico</title>
+  <updated>2026-03-25T12:00:00.000+01:00</updated>
+  <entry>
+    <id>https://contrataciondelestado.es/sindicacion/licitacionesPerfilContratante/TEST001</id>
+    <link href="https://contrataciondelestado.es/wps/poc?uri=deeplink:detalle_licitacion&amp;idEvl=ABC123"/>
+    <title>Servicio de mantenimiento de instalaciones deportivas municipales</title>
+    <summary type="text">Id licitacion: TEST001; Organo: Ayuntamiento de Sevilla; Importe: 50000; Estado: Publicada</summary>
+    <updated>2026-03-25T10:00:00.000+01:00</updated>
+    <cac-place-ext:ContractFolderStatus
+        xmlns:cac="urn:dgpe:names:draft:codice:schema:xsd:CommonAggregateComponents-2"
+        xmlns:cbc="urn:dgpe:names:draft:codice:schema:xsd:CommonBasicComponents-2"
+        xmlns:cac-place-ext="urn:dgpe:names:draft:codice-place-ext:schema:xsd:CommonAggregateComponents-2"
+        xmlns:cbc-place-ext="urn:dgpe:names:draft:codice-place-ext:schema:xsd:CommonBasicComponents-2">
+      <cbc:ContractFolderID>EXP/2026/0001</cbc:ContractFolderID>
+      <cbc-place-ext:ContractFolderStatusCode>PUB</cbc-place-ext:ContractFolderStatusCode>
+      <cac-place-ext:LocatedContractingParty>
+        <cac:Party>
+          <cac:PartyIdentification>
+            <cbc:ID schemeName="NIF">P4109100E</cbc:ID>
+          </cac:PartyIdentification>
+          <cac:PartyIdentification>
+            <cbc:ID schemeName="DIR3">L01410917</cbc:ID>
+          </cac:PartyIdentification>
+          <cac:PartyIdentification>
+            <cbc:ID schemeName="ID_PLATAFORMA">12345</cbc:ID>
+          </cac:PartyIdentification>
+          <cac:PartyName>
+            <cbc:Name>Ayuntamiento de Sevilla</cbc:Name>
+          </cac:PartyName>
+          <cac:PostalAddress>
+            <cbc:CityName>Sevilla</cbc:CityName>
+            <cbc:PostalZone>41004</cbc:PostalZone>
+          </cac:PostalAddress>
+          <cac:Contact>
+            <cbc:ElectronicMail>contratacion@sevilla.org</cbc:ElectronicMail>
+          </cac:Contact>
+          <cbc:BuyerProfileURIID>https://contrataciondelestado.es/wps/poc?uri=deeplink:perfilContratante&amp;idBp=ABC</cbc:BuyerProfileURIID>
+        </cac:Party>
+      </cac-place-ext:LocatedContractingParty>
+      <cac:ProcurementProject>
+        <cbc:Name>Servicio de mantenimiento de instalaciones deportivas municipales</cbc:Name>
+        <cbc:TypeCode>2</cbc:TypeCode>
+        <cac:BudgetAmount>
+          <cbc:EstimatedOverallContractAmount currencyID="EUR">60000.00</cbc:EstimatedOverallContractAmount>
+          <cbc:TaxExclusiveAmount currencyID="EUR">50000.00</cbc:TaxExclusiveAmount>
+          <cbc:TotalAmount currencyID="EUR">60500.00</cbc:TotalAmount>
+        </cac:BudgetAmount>
+        <cac:RequiredCommodityClassification>
+          <cbc:ItemClassificationCode>50870000-4</cbc:ItemClassificationCode>
+        </cac:RequiredCommodityClassification>
+        <cac:RealizedLocation>
+          <cbc:CountrySubentity>Sevilla</cbc:CountrySubentity>
+          <cbc:CountrySubentityCode>ES618</cbc:CountrySubentityCode>
+        </cac:RealizedLocation>
+        <cac:PlannedPeriod>
+          <cbc:DurationMeasure unitCode="MON">12</cbc:DurationMeasure>
+        </cac:PlannedPeriod>
+      </cac:ProcurementProject>
+      <cac:TenderingProcess>
+        <cbc:ProcedureCode>1</cbc:ProcedureCode>
+        <cbc:UrgencyCode>1</cbc:UrgencyCode>
+        <cac:TenderSubmissionDeadlinePeriod>
+          <cbc:EndDate>2026-04-15</cbc:EndDate>
+          <cbc:EndTime>14:00:00</cbc:EndTime>
+        </cac:TenderSubmissionDeadlinePeriod>
+      </cac:TenderingProcess>
+    </cac-place-ext:ContractFolderStatus>
+  </entry>
+</feed>
