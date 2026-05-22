@@ -16,6 +16,20 @@ function redactUrl(raw: string): string {
   }
 }
 
+/** Detect whether the URL targets a Unix socket (used for logging). */
+function describeTransport(raw: string): { transport: string; host: string | null } {
+  try {
+    const u = new URL(raw);
+    const socket = u.searchParams.get('host');
+    if (socket && socket.startsWith('/')) {
+      return { transport: 'unix-socket', host: socket };
+    }
+    return { transport: 'tcp', host: u.hostname || null };
+  } catch {
+    return { transport: 'unknown', host: null };
+  }
+}
+
 /** Extract every interesting field from an error (including drizzle's wrapped cause). */
 function describeError(err: unknown): Record<string, unknown> {
   if (!(err instanceof Error)) return { value: String(err) };
@@ -50,6 +64,7 @@ function describeError(err: unknown): Record<string, unknown> {
 }
 
 async function main(): Promise<void> {
+  const transport = describeTransport(env.DATABASE_URL);
   logger.info(
     {
       tmpDir: env.TMP_DIR,
@@ -57,6 +72,7 @@ async function main(): Promise<void> {
       logLevel: env.LOG_LEVEL,
       runMigrations: env.RUN_MIGRATIONS,
       databaseUrl: redactUrl(env.DATABASE_URL),
+      ...transport,
     },
     'starting licitaciones-sync',
   );

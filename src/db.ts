@@ -131,14 +131,38 @@ export type Db = ReturnType<typeof drizzle>;
 
 /**
  * Build a Drizzle DB client from a connection URL.
- * - Local: postgres://user:pass@host:port/dbname
- * - Cloud SQL Unix socket: postgres://user:pass@/dbname?host=/cloudsql/...
+ * Two URL shapes are supported:
+ *  - TCP:  `postgres://user:pass@host:port/dbname`
+ *  - Cloud SQL Unix socket: `postgres://user:pass@HOST/dbname?host=/cloudsql/PROJECT:REGION:INSTANCE`
+ *
+ * When the `?host=/...` query parameter is present, `postgres.js` (unlike libpq)
+ * does NOT use it for the connection — it would still try the URL hostname and
+ * fail with ECONNREFUSED 127.0.0.1:5432 inside Cloud Run. We detect that case
+ * and pass the socket path as the explicit `host` option.
  */
 export function createDb(databaseUrl: string): { db: Db; close(): Promise<void> } {
-  const sqlClient = postgres(databaseUrl, {
-    max: 5,
-    prepare: false,
-  });
+  const baseOptions = { max: 5, prepare: false };
+  let sqlClient: ReturnType<typeof postgres>;
+
+  let parsed: URL | null = null;
+  try {
+    parsed = new URL(databaseUrl);
+  } catch {
+    parsed = null;
+  }
+  const socketHost = parsed?.searchParams.get('host');
+  if (parsed && socketHost && socketHost.startsWith('/')) {
+    sqlClient = postgres({
+      ...baseOptions,
+      host: socketHost,
+      username: decodeURIComponent(parsed.username),
+      password: decodeURIComponent(parsed.password),
+      database: parsed.pathname.replace(/^\//, '') || undefined,
+    });
+  } else {
+    sqlClient = postgres(databaseUrl, baseOptions);
+  }
+
   const db = drizzle(sqlClient);
   return {
     db,
