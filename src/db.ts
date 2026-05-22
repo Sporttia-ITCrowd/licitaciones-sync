@@ -1,4 +1,5 @@
 import {
+  bigserial,
   boolean,
   date,
   index,
@@ -6,9 +7,9 @@ import {
   jsonb,
   numeric,
   pgTable,
-  primaryKey,
   text,
   timestamp,
+  unique,
   varchar,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
@@ -16,22 +17,23 @@ import { sql } from 'drizzle-orm';
 export const tenders = pgTable(
   'tenders',
   {
+    id: bigserial('id', { mode: 'number' }).primaryKey(),
     source: varchar('source', { length: 32 }).notNull(),
-    id: text('id').notNull(),
+    externalId: text('external_id').notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull(),
     ingestedAt: timestamp('ingested_at', { withTimezone: true })
       .notNull()
       .default(sql`NOW()`),
 
     fileNumber: text('file_number'),
-    statusCode: varchar('status_code', { length: 16 }),
+    statusCode: text('status_code'),
 
     authorityName: text('authority_name'),
-    authorityTaxId: varchar('authority_tax_id', { length: 32 }),
-    authorityDir3: varchar('authority_dir3', { length: 32 }),
+    authorityTaxId: text('authority_tax_id'),
+    authorityDir3: text('authority_dir3'),
     authorityPlatformId: text('authority_platform_id'),
     authorityCity: text('authority_city'),
-    authorityPostalCode: varchar('authority_postal_code', { length: 16 }),
+    authorityPostalCode: text('authority_postal_code'),
     authorityEmail: text('authority_email'),
     authorityProfileUrl: text('authority_profile_url'),
     authorityHierarchy: text('authority_hierarchy'),
@@ -39,31 +41,31 @@ export const tenders = pgTable(
     title: text('title'),
     subject: text('subject'),
     summary: text('summary'),
-    contractTypeCode: varchar('contract_type_code', { length: 8 }),
-    subtypeCode: varchar('subtype_code', { length: 16 }),
-    mainCpv: varchar('main_cpv', { length: 16 }),
+    contractTypeCode: text('contract_type_code'),
+    subtypeCode: text('subtype_code'),
+    mainCpv: text('main_cpv'),
     cpvs: text('cpvs')
       .array()
       .notNull()
       .default(sql`'{}'::text[]`),
-    locationNuts: varchar('location_nuts', { length: 16 }),
+    locationNuts: text('location_nuts'),
     locationName: text('location_name'),
     locationCity: text('location_city'),
-    locationPostalCode: varchar('location_postal_code', { length: 16 }),
+    locationPostalCode: text('location_postal_code'),
     durationValue: integer('duration_value'),
-    durationUnit: varchar('duration_unit', { length: 8 }),
+    durationUnit: text('duration_unit'),
     periodStart: date('period_start'),
     periodEnd: date('period_end'),
 
     estimatedValue: numeric('estimated_value', { precision: 18, scale: 2 }),
     budgetWithoutTax: numeric('budget_without_tax', { precision: 18, scale: 2 }),
     budgetWithTax: numeric('budget_with_tax', { precision: 18, scale: 2 }),
-    currency: varchar('currency', { length: 3 }).default('EUR'),
+    currency: text('currency').default('EUR'),
 
-    procedureCode: varchar('procedure_code', { length: 8 }),
-    urgencyCode: varchar('urgency_code', { length: 8 }),
-    contractingSystemCode: varchar('contracting_system_code', { length: 8 }),
-    submissionMethodCode: varchar('submission_method_code', { length: 8 }),
+    procedureCode: text('procedure_code'),
+    urgencyCode: text('urgency_code'),
+    contractingSystemCode: text('contracting_system_code'),
+    submissionMethodCode: text('submission_method_code'),
     submissionDeadline: timestamp('submission_deadline', { withTimezone: true }),
     documentationDeadline: date('documentation_deadline'),
     publicationDate: date('publication_date'),
@@ -72,14 +74,14 @@ export const tenders = pgTable(
     awardAmountWithoutTax: numeric('award_amount_without_tax', { precision: 18, scale: 2 }),
     awardAmountWithTax: numeric('award_amount_with_tax', { precision: 18, scale: 2 }),
     awardeeName: text('awardee_name'),
-    awardeeTaxId: varchar('awardee_tax_id', { length: 32 }),
+    awardeeTaxId: text('awardee_tax_id'),
     tenderCount: integer('tender_count'),
     awardeeIsSme: boolean('awardee_is_sme'),
-    resultCode: varchar('result_code', { length: 8 }),
+    resultCode: text('result_code'),
 
     detailUrl: text('detail_url'),
     deletedAt: timestamp('deleted_at', { withTimezone: true }),
-    deletedReason: varchar('deleted_reason', { length: 16 }),
+    deletedReason: text('deleted_reason'),
 
     lots: jsonb('lots')
       .notNull()
@@ -93,7 +95,7 @@ export const tenders = pgTable(
     rawPayload: jsonb('raw_payload').notNull(),
   },
   (t) => [
-    primaryKey({ columns: [t.source, t.id] }),
+    unique('tenders_source_external_id_unique').on(t.source, t.externalId),
     index('tenders_updated_idx').on(t.updatedAt.desc()),
     index('tenders_status_idx').on(t.statusCode),
     index('tenders_authority_tax_idx').on(t.authorityTaxId),
@@ -185,13 +187,14 @@ export async function upsertTenders(
 ): Promise<{ inserted: number; updated: number; skipped: number }> {
   if (batch.length === 0) return { inserted: 0, updated: 0, skipped: 0 };
 
-  // PLACSP feeds can contain the same (source, id) several times within the same
-  // batch (multiple state transitions: PUB → ADJ → RES). Postgres' ON CONFLICT
-  // refuses to update the same row twice in a single statement ("cannot affect
-  // row a second time"), so we keep only the latest entry per key.
+  // PLACSP feeds can contain the same (source, external_id) several times
+  // within the same batch (multiple state transitions: PUB → ADJ → RES).
+  // Postgres' ON CONFLICT refuses to update the same row twice in a single
+  // statement ("cannot affect row a second time"), so we keep only the latest
+  // entry per key.
   const deduped = new Map<string, Tender>();
   for (const t of batch) {
-    const key = `${t.source}\x00${t.id}`;
+    const key = `${t.source}\x00${t.external_id}`;
     const prev = deduped.get(key);
     if (!prev || t.updated_at >= prev.updated_at) deduped.set(key, t);
   }
@@ -199,7 +202,7 @@ export async function upsertTenders(
 
   const rows = dedupedBatch.map((t) => ({
     source: t.source,
-    id: t.id,
+    externalId: t.external_id,
     updatedAt: t.updated_at,
     fileNumber: t.file_number,
     statusCode: t.status_code,
@@ -257,7 +260,7 @@ export async function upsertTenders(
     .insert(tenders)
     .values(rows)
     .onConflictDoUpdate({
-      target: [tenders.source, tenders.id],
+      target: [tenders.source, tenders.externalId],
       set: {
         updatedAt: dsql`EXCLUDED.updated_at`,
         ingestedAt: dsql`NOW()`,
@@ -331,7 +334,7 @@ export async function upsertTenders(
 export function dedupeByKey(batch: Tender[]): Tender[] {
   const map = new Map<string, Tender>();
   for (const t of batch) {
-    const key = `${t.source}\x00${t.id}`;
+    const key = `${t.source}\x00${t.external_id}`;
     const prev = map.get(key);
     if (!prev || t.updated_at >= prev.updated_at) map.set(key, t);
   }
@@ -344,14 +347,14 @@ export function dedupeByKey(batch: Tender[]): Tender[] {
 export async function markDeleted(
   db: Db,
   source: string,
-  id: string,
+  externalId: string,
   when: Date,
   reason: string | null,
 ): Promise<void> {
   await db
     .update(tenders)
     .set({ deletedAt: when, deletedReason: reason })
-    .where(and(eq(tenders.source, source), eq(tenders.id, id)));
+    .where(and(eq(tenders.source, source), eq(tenders.externalId, externalId)));
 }
 
 // ────────────────────────────────────────────────────────────────────

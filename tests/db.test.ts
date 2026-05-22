@@ -41,12 +41,16 @@ beforeEach(async () => {
   await db.delete(syncLocks);
 });
 
-function fakeTender(id: string, updatedAt: string, overrides: Partial<Tender> = {}): Tender {
+function fakeTender(
+  externalId: string,
+  updatedAt: string,
+  overrides: Partial<Tender> = {},
+): Tender {
   return {
     source: 'placsp',
-    id,
+    external_id: externalId,
     updated_at: new Date(updatedAt),
-    file_number: 'EXP-' + id,
+    file_number: 'EXP-' + externalId,
     status_code: 'PUB',
     authority_name: 'Org',
     authority_tax_id: null,
@@ -57,7 +61,7 @@ function fakeTender(id: string, updatedAt: string, overrides: Partial<Tender> = 
     authority_email: null,
     authority_profile_url: null,
     authority_hierarchy: null,
-    title: 'Test ' + id,
+    title: 'Test ' + externalId,
     subject: null,
     summary: null,
     contract_type_code: '2',
@@ -95,7 +99,7 @@ function fakeTender(id: string, updatedAt: string, overrides: Partial<Tender> = 
     lots: [],
     results: [],
     documents: [],
-    raw_payload: { id, marker: true },
+    raw_payload: { id: externalId, marker: true },
     ...overrides,
   };
 }
@@ -107,7 +111,9 @@ describe('upsertTenders', () => {
     expect(r.updated).toBe(0);
     const rows = await db.select().from(tenders);
     expect(rows).toHaveLength(1);
-    expect(rows[0].id).toBe('a');
+    expect(rows[0].externalId).toBe('a');
+    expect(typeof rows[0].id).toBe('number');
+    expect(rows[0].id).toBeGreaterThan(0);
     expect(rows[0].cpvs).toEqual(['50000000-5']);
     expect(rows[0].rawPayload).toEqual({ id: 'a', marker: true });
   });
@@ -211,7 +217,7 @@ describe('markDeleted', () => {
     const rows = await db
       .select()
       .from(tenders)
-      .where(eq(tenders.id, 'a'));
+      .where(eq(tenders.externalId, 'a'));
     expect(rows[0].deletedReason).toBe('ANULADA');
     expect(rows[0].deletedAt).toBeInstanceOf(Date);
   });

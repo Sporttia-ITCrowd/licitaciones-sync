@@ -34,6 +34,42 @@ export interface SyncResult {
 const SOURCE = 'placsp';
 const LOCK_NAME = 'placsp_sync';
 
+const MONTH_NAMES_ES = [
+  'enero',
+  'febrero',
+  'marzo',
+  'abril',
+  'mayo',
+  'junio',
+  'julio',
+  'agosto',
+  'septiembre',
+  'octubre',
+  'noviembre',
+  'diciembre',
+];
+
+/**
+ * Turn a cursor like '202604' into a readable date label such as
+ * '2026-04 (abril 2026)'. Yearly cursors like '2012' become 'año 2012'.
+ */
+function formatPeriod(cursor: string): string {
+  if (cursor.length === 6) {
+    const year = cursor.slice(0, 4);
+    const month = parseInt(cursor.slice(4, 6), 10);
+    const monthName = MONTH_NAMES_ES[month - 1] ?? `month-${month}`;
+    return `${year}-${cursor.slice(4, 6)} (${monthName} ${year})`;
+  }
+  return `año ${cursor}`;
+}
+
+function formatSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1_000_000) return `${(bytes / 1024).toFixed(1)} KB`;
+  if (bytes < 1_000_000_000) return `${(bytes / 1_000_000).toFixed(1)} MB`;
+  return `${(bytes / 1_000_000_000).toFixed(2)} GB`;
+}
+
 /**
  * Try the whole batch; if it fails, fall back to per-row inserts and log the offenders.
  * Prevents one bad record from killing an entire period.
@@ -75,7 +111,7 @@ async function upsertBatchSafe(
       log.warn(
         {
           period,
-          id: t.id,
+          external_id: t.external_id,
           file_number: t.file_number,
           ...summary.fields,
           message: summary.message,
@@ -177,10 +213,11 @@ export async function sync(
 
     for (const period of periods) {
       const periodStart = Date.now();
+      const periodLabel = formatPeriod(period.cursor);
       const zipPath = join(env.TMP_DIR, `placsp-${period.cursor}.zip`);
       log.info(
         { period: period.cursor, url: period.url, isCurrent: period.isCurrent },
-        'processing period',
+        `processing period ${periodLabel}`,
       );
 
       let meta;
@@ -189,14 +226,17 @@ export async function sync(
           userAgent: env.PLACSP_USER_AGENT,
         });
       } catch (err) {
-        log.error({ period: period.cursor, err: String(err) }, 'download failed, skipping period');
+        log.error(
+          { period: period.cursor, err: String(err) },
+          `download failed for ${periodLabel}, skipping period`,
+        );
         periodsSkipped++;
         continue;
       }
       if (!meta) {
         log.warn(
           { period: period.cursor },
-          'zip not available (304 or 404), skipping period',
+          `zip not available (304 or 404) for ${periodLabel}, skipping period`,
         );
         periodsSkipped++;
         continue;
@@ -207,7 +247,7 @@ export async function sync(
           sizeBytes: meta.sizeBytes,
           lastModified: meta.lastModified,
         },
-        'zip downloaded',
+        `zip downloaded for ${periodLabel} (${formatSize(meta.sizeBytes)})`,
       );
 
       let buffer: Tender[] = [];
@@ -217,7 +257,10 @@ export async function sync(
 
       for await (const { name, stream } of streamAtoms(zipPath)) {
         atomsSeen++;
-        log.debug({ period: period.cursor, atom: name }, 'parsing atom');
+        log.debug(
+          { period: period.cursor, atom: name },
+          `parsing atom ${name} for ${periodLabel}`,
+        );
         for await (const ev of parseAtom(stream)) {
           if (ev.type === 'tombstone') {
             try {
@@ -227,12 +270,12 @@ export async function sync(
             } catch (err) {
               log.warn(
                 { period: period.cursor, ref: ev.ref, err: String(err) },
-                'failed to mark tombstone',
+                `failed to mark tombstone for ${periodLabel}`,
               );
             }
           } else if (ev.type === 'entry') {
             const tender = mapEntry(ev.raw, SOURCE);
-            if (!tender.id) continue;
+            if (!tender.external_id) continue;
             buffer.push(tender);
             if (
               !lastEntryUpdated ||
@@ -271,7 +314,7 @@ export async function sync(
           tombstones: periodTombs,
           durationMs: Date.now() - periodStart,
         },
-        'period completed',
+        `period ${periodLabel} completed (${periodEntries} entries, ${periodTombs} tombstones, ${((Date.now() - periodStart) / 1000).toFixed(1)}s)`,
       );
     }
 

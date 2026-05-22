@@ -117,11 +117,11 @@ describe('parseAtom', () => {
 
 // ───────────────────────────────── mapEntry ─────────────────────────────────
 describe('mapEntry', () => {
-  it('sets source and id', async () => {
+  it('sets source and external_id', async () => {
     const t = mapEntry(await loadEntry('entry-basico.atom'));
     expect(t.source).toBe('placsp');
-    expect(t.id).toMatch(/^https:\/\//);
-    expect(t.id).toContain('TEST001');
+    expect(t.external_id).toMatch(/^https:\/\//);
+    expect(t.external_id).toContain('TEST001');
   });
 
   it('maps updated_at as Date in UTC', async () => {

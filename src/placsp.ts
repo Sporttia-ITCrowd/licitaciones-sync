@@ -56,7 +56,7 @@ export interface Document {
 
 export interface Tender {
   source: string;
-  id: string;
+  external_id: string;
   updated_at: Date;
 
   file_number: string | null;
@@ -572,7 +572,7 @@ export function mapEntry(raw: RawNode, source = 'placsp'): Tender {
 
   return {
     source,
-    id: idStr,
+    external_id: idStr,
     updated_at,
 
     file_number: text(cfs.ContractFolderID),
